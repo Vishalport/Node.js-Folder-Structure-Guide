@@ -49,8 +49,8 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.organization=vishalsubharthi
-          -Dsonar.projectKey=CICD
+          -Dsonar.organization=devopsport
+          -Dsonar.projectKey=devopsport_devopsport
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
