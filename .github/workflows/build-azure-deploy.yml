@@ -3,7 +3,7 @@ name: Build, Analyze, and Deploy
 on:
   push:
     tags:
-      - 'v1.08.24'  # Releases: v1.08.24
+      - 'v*'  # Releases: v1.08.24
 
 jobs:
   build:
