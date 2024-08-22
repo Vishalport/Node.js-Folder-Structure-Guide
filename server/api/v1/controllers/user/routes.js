@@ -2,4 +2,4 @@ import Express from "express";
 import controller from "./controller";
 
 export default Express.Router()
-    .get('/login', controller.userLogin)
+    .post('/login', controller.userLogin)

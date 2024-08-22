@@ -1,9 +1,9 @@
-name: Build, Analyze and Deploy
+name: Build, Analyze, and Deploy
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v1.08.24'  # Releases: v1.08.24
 
 jobs:
   build:
@@ -17,20 +17,18 @@ jobs:
       run: |
         echo "Logging in to Docker Hub..."
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-      env:
-        DEBUG: 1
 
     - name: Build the Docker image
-      run: docker build . -t nodeserver:latest
+      run: docker build . -t nodeserver:${{ github.ref_name }}  # Using the tag name as the image tag
 
     - name: List Docker images
       run: docker image ls
 
     - name: Tag Docker image
-      run: docker tag nodeserver:latest devopsport2165/nodeserver:latest
+      run: docker tag nodeserver:${{ github.ref_name }} devopsport2165/nodeserver:${{ github.ref_name }}
 
     - name: Push the Docker image to Docker Hub
-      run: docker push devopsport2165/nodeserver:latest
+      run: docker push devopsport2165/nodeserver:${{ github.ref_name }}
 
   sonarQubeAnalysis:
     runs-on: ubuntu-latest
@@ -68,4 +66,4 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: your-app-name
-        images: devopsport2165/nodeserver:latest
+        images: devopsport2165/nodeserver:${{ github.ref_name }}
