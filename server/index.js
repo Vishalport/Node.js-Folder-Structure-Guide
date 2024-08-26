@@ -2,7 +2,7 @@ import Config from "config";
 import Routes from "./routes";
 import Server from "./common/server";
 
-const dbUrl = `mongodb+srv://MoonDive:Bluemoon@mores.msntkot.mongodb.net/Mores`;
+const dbUrl = `mongodb+srv://web3vishal:lx988iCjP0Zga9gu@cluster0.rqb3p.mongodb.net/`;
 const server = new Server()
   .router(Routes)
   .handleError()

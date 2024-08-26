@@ -2,9 +2,8 @@
 import response from "../../../../../config/response";
 import responseMessage from "../../../../../assets/responseMessage";
 import { __token } from "../../../../../text";
-import userType from "../../../../enums/userType";
-import { USER } from "../../../../enums/userType";
 import commonFunction from "../../../../helper/utils"
+import { userServices } from '../../services/user';
 
 const cookieOptions = {
   httpOnly: true,
@@ -13,31 +12,30 @@ const cookieOptions = {
   maxAge: 5 * 60 * 1000,
 };
 
+
+const { findUser } = userServices;
+
 export class userController {
 
   async userLogin(req, res, next) {
     try {
-      const { email, password } = req.body;
-      if (email === "admin@gmail.com") {
-        if (password === "admin") {
-          const token = await commonFunction.getToken({
-            email: email,
-            password: password,
-            userType: USER
-          });
-          res.cookie(__token, token, cookieOptions);
-          return res.json(response.success({ email, token }, responseMessage.USER_DETAILS));
-        } else {
-          return res.json(response.unauthorized({}, responseMessage.INCORRECT_PASSWORD));
-        }
-      } else {
-        return res.json(response.unauthorized({}, responseMessage.INCORRECT_EMAIL));
+      const { email, password, userType } = req.body;
+      const userInfo = await findUser({ email, password, userType });
+      if (!userInfo) {
+        return res.json(response.unauthorized({}, responseMessage.INCORRECT_CREDENTIAL));
       }
+      const token = await commonFunction.getToken({
+        email: email,
+        password: password,
+        userInfo
+      });
+      res.cookie(__token, token, cookieOptions);
+      return res.json(response.success(req.session, responseMessage.USER_DETAILS));
     } catch (error) {
       return res.json(response.internal("Internal Server Error"));
     }
   }
-  
+
   async getInfo(req, res, next) {
     try {
       const userResult = req.result
