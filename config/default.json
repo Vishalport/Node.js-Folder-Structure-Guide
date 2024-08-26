@@ -1,0 +1,7 @@
+{
+  "author": "no-vishal <vishal.kumar@moondive.co> (https://www.moondive.co/)",
+  "jwtOptions": {
+    "expiresIn": "5m",
+    "jwtSecret": "nodeJwt"
+  }
+}

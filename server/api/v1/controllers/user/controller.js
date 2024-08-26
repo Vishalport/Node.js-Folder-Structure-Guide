@@ -1,7 +1,10 @@
 
-import response from "../../../../../assets/response";
+import response from "../../../../../config/response";
 import responseMessage from "../../../../../assets/responseMessage";
-
+import { __token } from "../../../../../text";
+import userType from "../../../../enums/userType";
+import { USER } from "../../../../enums/userType";
+import commonFunction from "../../../../helper/utils"
 
 const cookieOptions = {
   httpOnly: true,
@@ -11,26 +14,34 @@ const cookieOptions = {
 };
 
 export class userController {
-  async getInfo(req, res, next) {
-    try {
-      return res.status(200).json(new response({}, responseMessage.USER_DETAILS));
-    } catch (error) {
-      return res.status(500).json(new response({}, "Internal Server Error"));
-    }
-  }
+
   async userLogin(req, res, next) {
     try {
       const { email, password } = req.body;
       if (email === "admin@gmail.com") {
         if (password === "admin") {
-          res.cookie("authToken", "token_here", cookieOptions);
-          return res.status(200).json(new response({ email }, responseMessage.USER_DETAILS));
+          const token = await commonFunction.getToken({
+            email: email,
+            password: password,
+            userType: USER
+          });
+          res.cookie(__token, token, cookieOptions);
+          return res.json(response.success({ email, token }, responseMessage.USER_DETAILS));
         } else {
-          return res.status(401).json(new response({}, responseMessage.INCORRECT_PASSWORD));
+          return res.json(response.unauthorized({}, responseMessage.INCORRECT_PASSWORD));
         }
       } else {
-        return res.status(401).json(new response({}, responseMessage.INCORRECT_EMAIL));
+        return res.json(response.unauthorized({}, responseMessage.INCORRECT_EMAIL));
       }
+    } catch (error) {
+      return res.json(response.internal("Internal Server Error"));
+    }
+  }
+  
+  async getInfo(req, res, next) {
+    try {
+      const userResult = req.result
+      return res.status(200).json(new response(userResult, responseMessage.USER_DETAILS));
     } catch (error) {
       return res.status(500).json(new response({}, "Internal Server Error"));
     }
