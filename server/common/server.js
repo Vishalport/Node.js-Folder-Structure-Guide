@@ -5,8 +5,8 @@ import * as path from "path";
 import cors from "cors";
 import morgan from "morgan";
 import apiErrorHandler from '../helper/apiErrorHandler';
-import cookieParser from 'cookie-parser';
 import session from "express-session";
+import cookieParser from "cookie-parser";
 
 const app = new express();
 const server = http.createServer(app);

@@ -6,7 +6,9 @@ const expiresIn = config.get('jwtOptions.expiresIn');
 
 module.exports = {
     getToken: async (payload) => {
-        const token = await jwt.sign(payload, jwtSecret);
+        const token = await jwt.sign(payload, jwtSecret, {
+            expiresIn: expiresIn
+        });
         return token;
     }
 }

@@ -1,24 +1,28 @@
-import config from "config";
-import jwt from "jsonwebtoken";
-import userModel from "../models/user";
-import responseMessage, { BLOCK_BY_ADMIN, DELETE_BY_ADMIN, USER_NOT_FOUND } from '../../config/responseMessage';
-import response from "../../config/response";
-import { BLOCK, DELETE } from "../enums/status";
+import jwt from 'jsonwebtoken';
+import config from 'config';
+import response from '../../config/response';
+import responseMessage from '../../config/responseMessage';
+import { __token } from '../../text';
+
+const jwtSecret = config.get('jwtOptions.jwtSecret');
 
 module.exports = {
     verifyToken(req, res, next) {
-        if (req.cookies.token) {
-            jwt.verify(req.cookies.token, config.get('jwtsecret'), (err, result) => {
+        const token = req.cookies[__token]; // Extract token directly from cookies
+        if (token) {
+            jwt.verify(token, jwtSecret, (err, decoded) => {
                 if (err) {
-                    return res.json(err);
+                    // Clear the cookie if the token is invalid or expired
+                    res.clearCookie(__token, { path: '/' });
+                    return res.status(401).json({ responseCode: 401, responseMessage: 'Invalid or expired token' });
                 }
-                else {
-                    req.result;
-                    next();
-                }
-            })
+
+                // Attach the decoded token data to the request object
+                req.user = decoded;
+                next();
+            });
         } else {
-            return res.json(response.badRequest({}, responseMessage.NO_TOKEN))
+            return res.status(400).json(response.badRequest({}, responseMessage.NO_TOKEN));
         }
-    },
-}
+    }
+};
