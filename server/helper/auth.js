@@ -16,7 +16,6 @@ module.exports = {
                     res.clearCookie(__token, { path: '/' });
                     return res.status(401).json({ responseCode: 401, responseMessage: 'Invalid or expired token' });
                 }
-
                 // Attach the decoded token data to the request object
                 req.user = decoded;
                 next();

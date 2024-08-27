@@ -5,4 +5,4 @@ import auth from "../../../../helper/auth"
 export default Express.Router()
     .post('/login', controller.userLogin)
     .use(auth.verifyToken)
-    .get('/get-profile', controller.getInfo)
+    .post('/get-profile', controller.getInfo)

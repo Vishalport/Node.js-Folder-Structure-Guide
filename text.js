@@ -1,3 +1,3 @@
 module.exports = {
-    __token: "__secrete-jwt-auth"
+    __token: "__secrete_jwt_auth"
 }
