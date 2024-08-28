@@ -2,8 +2,8 @@ name: Build, Analyze, and Notify
 
 on:
   push:
-    branch:
-      - 'main'  # Releases: v1.08.24
+    tags:
+      - 'v*'  # Releases: v1.08.24
 
 jobs:
   build:
