@@ -2,8 +2,8 @@ name: Build, Analyze, and Notify
 
 on:
   push:
-    tags:
-      - 'v*'  # Releases: v1.08.24
+    branch:
+      - 'main'  # Releases: v1.08.24
 
 jobs:
   build:
@@ -66,7 +66,7 @@ jobs:
     - name: Update Deployment Files
       run: |
         echo "Updating Terraform or Deployment files..."
-        
+
     - name: Commit and Push Changes
       run: |
         git config --local user.name "github-actions[bot]"
