@@ -1,4 +1,4 @@
-name: Build, Analyze, and Notify
+name: Build, Analyze, and Deploy Node.js
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
         echo "Logging in to Docker Hub..."
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Build the Docker image
+    - name: Build Docker image
       run: docker build . -t nodeserver:${{ github.ref_name }}  # Using the tag name as the image tag
 
     - name: List Docker images
@@ -27,7 +27,7 @@ jobs:
     - name: Tag Docker image
       run: docker tag nodeserver:${{ github.ref_name }} devopsport2165/nodeserver:${{ github.ref_name }}
 
-    - name: Push the Docker image to Docker Hub
+    - name: Push Docker image to Docker Hub
       run: docker push devopsport2165/nodeserver:${{ github.ref_name }}
 
   sonarQubeAnalysis:
@@ -58,8 +58,13 @@ jobs:
 
     steps:
     - name: Deploy to EC2
+      env:
+        EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        EC2_PUBLIC_ADDRESS: ${{ secrets.EC2_PUBLIC_ADDRESS }}
       run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_ADDRESS }} << 'EOF'
+        echo "${EC2_SSH_PRIVATE_KEY}" > private_key.pem
+        chmod 600 private_key.pem
+        ssh -i private_key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_ADDRESS }} << 'EOF'
           # Update and install Docker
           sudo yum update -y
           sudo yum install -y docker
@@ -75,6 +80,7 @@ jobs:
           # Run new container
           docker run -d --name nodeserver -p 80:80 devopsport2165/nodeserver:${{ github.ref_name }}
         EOF
+        rm private_key.pem
 
   notify-infra-repo:
     runs-on: ubuntu-latest
@@ -84,7 +90,7 @@ jobs:
     - name: Checkout Infrastructure Repo
       uses: actions/checkout@v3
       with:
-        repository: https://github.com/Vishalport/terraform-infrastructure-iac  # Replace with your repo
+        repository: https://github.com/your-repo/terraform-infrastructure-iac  # Replace with your repo
         token: ${{ secrets.GIT_TOKEN }}
 
     - name: Update Deployment Files
